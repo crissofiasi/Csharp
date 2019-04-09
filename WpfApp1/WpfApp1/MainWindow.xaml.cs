@@ -13,14 +13,40 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
+using System.Reflection;
 
 namespace WpfApp1
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+    ///
     public partial class MainWindow : Window
     {
+        public class DataLists
+        {
+            public List<SubItem> listLeft;
+            public List<SubItem> listRight;
+
+        }
+
+        DataLists dataLists=new DataLists();
+        public List<SubItem>  GetFileList(string DirectoryPath)
+        {
+            List<SubItem> list = new List<SubItem>();
+
+            DirectoryInfo currentDir = new DirectoryInfo(DirectoryPath);
+            if (!currentDir.Exists)
+                return null;
+
+            list.Add(new SubItem(currentDir, ".."));
+            foreach (DirectoryInfo dir in currentDir.GetDirectories())
+                list.Add( new SubItem(dir) );
+            foreach (FileInfo file in currentDir.GetFiles())
+                list.Add(new SubItem(file));
+
+            return list;
+        }
         public MainWindow()
         {
             InitializeComponent();
@@ -30,6 +56,13 @@ namespace WpfApp1
         {
             ClearWindow();
             PopulateDriveComboBoxes();
+
+            dgLeft.ItemsSource = dataLists.listLeft;
+            dgRight.ItemsSource = dataLists.listRight;
+
+
+
+
         }
 
         private void ClearWindow()
@@ -43,15 +76,48 @@ namespace WpfApp1
 
         private void PopulateDriveComboBoxes()
         {
+
             foreach (DriveInfo di in DriveInfo.GetDrives())
                 foreach (ComboBox cb in GrdMain.Children.OfType<ComboBox>())
                     cb.Items.Add(di);
+
+
+            foreach (ComboBox cb in GrdMain.Children.OfType<ComboBox>())
+                foreach (object cbi in cb.Items)
+                    if (((DriveInfo)cbi).IsReady)
+                    {
+                        cb.SelectedItem = cbi;
+                        break;
+                    }
+
+
+
+
+
         }
 
         private void CmbDrive_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            ComboBox cb = (ComboBox)sender;
+            if(!((DriveInfo)cb.SelectedItem).IsReady)
+            {
+                MessageBox.Show("Drive Not Redy! Please chose onother");
+                cb.SelectedItem = e.RemovedItems[0];
+                return;
+   
+            }
+
             DisplayDriveVolumeLabel(sender);
             DisplayPath(sender);
+
+
+
+            DataGrid dg = SelectFilelistDataGrid(sender, ((ComboBox)sender).Name);
+
+            dg.ItemsSource = GetFileList(((DriveInfo)cb.SelectedItem).RootDirectory.FullName);
+
+
+
 
         }
 
@@ -68,6 +134,20 @@ namespace WpfApp1
             ComboBox cb = (ComboBox)sender;
             tb.Text = ((DriveInfo)cb.SelectedItem).VolumeLabel.ToString();
         }
+
+
+        DataGrid  SelectFilelistDataGrid(object sender, string name)
+        {
+            string nm = name.Replace("Cmb", "").Replace("Drive", "");
+            foreach (DataGrid dg in ((Grid)(((Control)sender).Parent)).Children.OfType<DataGrid>())
+                if (dg.Name.Contains(nm) )
+                    return dg;
+            return null;
+        }
+
+
+
+
 
         TextBlock SelectVolumeLabelTextBlock(object sender,string name)
         {
@@ -96,5 +176,6 @@ namespace WpfApp1
         {
             TblComandPath.Text = SelectPathTextBlock(sender, ((DataGrid)sender).Name).Text;
         }
+ 
     }
 }

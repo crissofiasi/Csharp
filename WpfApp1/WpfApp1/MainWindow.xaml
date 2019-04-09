@@ -17,7 +17,7 @@
             <ColumnDefinition x:Name="gdColLeft"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <DataGrid x:Name="dgLeft" Margin="10,45,4,0" Grid.Row="1" GotFocus="dg_GotFocus"/>
+        <DataGrid x:Name="dgLeft" Margin="10,45,4,0" Grid.Row="1" GotFocus="dg_GotFocus"  ItemsSource="{Binding Source=listLeft}"/>
         <DataGrid x:Name="dgRight" Grid.Column="1" Margin="5,45,10,0" Grid.Row="1" GotFocus="dg_GotFocus"/>
         <GridSplitter x:Name="gdVerticalSpliter" Grid.Row="1" Width="1" Margin="0" HorizontalAlignment="Left" Grid.Column="1"/>
         <Grid Grid.ColumnSpan="2" Height="30" Margin="9,0,11,8" Grid.Row="3" VerticalAlignment="Bottom">
