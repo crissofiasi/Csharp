@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace WpfApp1
 {
@@ -27,19 +28,31 @@ namespace WpfApp1
         {
             public List<SubItem> listLeft;
             public List<SubItem> listRight;
-
         }
-
         DataLists dataLists=new DataLists();
         public List<SubItem>  GetFileList(string DirectoryPath)
         {
             List<SubItem> list = new List<SubItem>();
-
             DirectoryInfo currentDir = new DirectoryInfo(DirectoryPath);
             if (!currentDir.Exists)
                 return null;
+            try
+            {
+                currentDir.GetDirectories();
+            }
+            catch
+            {
+                return null;
+            }
 
-            list.Add(new SubItem(currentDir, ".."));
+
+            if (currentDir.Parent != null)
+            {
+            SubItem first = new SubItem(currentDir.Parent, "..");
+            
+                list.Add(first);
+
+            }
             foreach (DirectoryInfo dir in currentDir.GetDirectories())
                 list.Add( new SubItem(dir) );
             foreach (FileInfo file in currentDir.GetFiles())
@@ -61,7 +74,8 @@ namespace WpfApp1
             dgRight.ItemsSource = dataLists.listRight;
 
 
-
+            PopulateDataGrid(CmbLeftDrive);
+            PopulateDataGrid(CmbRightDrive);
 
         }
 
@@ -99,33 +113,55 @@ namespace WpfApp1
         private void CmbDrive_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox cb = (ComboBox)sender;
-            if(!((DriveInfo)cb.SelectedItem).IsReady)
+            if (!((DriveInfo)cb.SelectedItem).IsReady)
             {
                 MessageBox.Show("Drive Not Redy! Please chose onother");
                 cb.SelectedItem = e.RemovedItems[0];
                 return;
-   
+
             }
 
             DisplayDriveVolumeLabel(sender);
-            DisplayPath(sender);
+           // DisplayPath(sender);
+            PopulateDataGrid(sender);
+        }
 
-
+        private void PopulateDataGrid(object sender)
+        {
+            ComboBox cb = (ComboBox)sender;
 
             DataGrid dg = SelectFilelistDataGrid(sender, ((ComboBox)sender).Name);
 
             dg.ItemsSource = GetFileList(((DriveInfo)cb.SelectedItem).RootDirectory.FullName);
+        }
 
+        private void PopulateDataGrid(object sender,string path)
+        {
+            Control cb = (Control)sender;
+            DataGrid dg = SelectFilelistDataGrid(sender, ((Control)sender).Name);
+            List<SubItem> fileList = GetFileList(path);
+            if (fileList == null)
+            {
+                MessageBox.Show("Acess Denied!");
+                return;
+            }
+            dg.ItemsSource = fileList;
 
-
+            DisplayPath(sender);
 
         }
 
+
+
         private void DisplayPath(object sender)
         {
-            ComboBox cb = (ComboBox)sender;
-            TextBlock tb = SelectPathTextBlock(sender, ((ComboBox)sender).Name);
-            tb.Text = ((DriveInfo)cb.SelectedItem).Name;
+            DataGrid dg = SelectFilelistDataGrid(sender, ((Control)sender).Name);
+
+          
+            TextBlock tb = SelectPathTextBlock(sender, ((Control)sender).Name);
+            dg.SelectedItem = dg.Items[0];
+            SubItem sb = (SubItem)dg.SelectedItem;
+            tb.Text = sb.Directory.FullName;
         }
 
         private void DisplayDriveVolumeLabel(object sender)
@@ -138,7 +174,7 @@ namespace WpfApp1
 
         DataGrid  SelectFilelistDataGrid(object sender, string name)
         {
-            string nm = name.Replace("Cmb", "").Replace("Drive", "");
+            string nm = name.Replace("Cmb", "").Replace("Drive", "").Replace("dg","");
             foreach (DataGrid dg in ((Grid)(((Control)sender).Parent)).Children.OfType<DataGrid>())
                 if (dg.Name.Contains(nm) )
                     return dg;
@@ -160,7 +196,7 @@ namespace WpfApp1
 
         TextBlock SelectPathTextBlock(object sender, string name)
         {
-            string nm = name.Replace("Cmb", "").Replace("Drive", "");
+            string nm = name.Replace("Cmb", "").Replace("Drive", "").Replace("dg", "");
             foreach (TextBlock tbl in ((Grid)(((Control)sender).Parent)).Children.OfType<TextBlock>())
                 if (tbl.Name.Contains(nm) && tbl.Name.ToLower().Contains("path"))
                     return tbl;
@@ -176,6 +212,29 @@ namespace WpfApp1
         {
             TblComandPath.Text = SelectPathTextBlock(sender, ((DataGrid)sender).Name).Text;
         }
- 
+
+        private void dg_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            HandleDblClickOrEnterPressed(sender);
+        }
+
+        private void HandleDblClickOrEnterPressed(object sender)
+        {
+            SubItem selectedItem = ((SubItem)(((DataGrid)sender).SelectedItem));
+            if (selectedItem.IsDirectory())
+            {
+                PopulateDataGrid(sender, selectedItem.FullName);
+            }
+            else
+                Process.Start(selectedItem.FullName.ToString());
+        }
+
+        private void dgKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter) { 
+                HandleDblClickOrEnterPressed(sender);
+
+            }
+        }
     }
 }
