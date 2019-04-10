@@ -54,7 +54,7 @@
             <Button Content="Edit" Margin="0" Grid.Column="1"/>
             <Button Content="Copy" Margin="0" Grid.Column="2"/>
             <Button Content="Move" Margin="0" Grid.Column="3"/>
-            <Button Content="New Folder" Margin="0" Grid.Column="4"/>
+            <Button Content="New Folder" Margin="0" Grid.Column="4" Click="Button_Click"/>
             <Button x:Name="BtnExit" Content="Exit" Margin="0" Grid.Column="5" Click="BtnExit_Click"/>
         </Grid>
         <TextBox Margin="296,0,10,53" Grid.Row="2" TextWrapping="Wrap" Text="TextBox" Height="23" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Grid.RowSpan="2"/>

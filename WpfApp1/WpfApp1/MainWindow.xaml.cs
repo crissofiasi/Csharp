@@ -21,6 +21,7 @@ namespace WpfApp1
         }
 
         private DataLists dataLists = new DataLists();
+        private string SelectedSide;
         public List<SubItem> GetFileList(string DirectoryPath)
         {
             List<SubItem> list = new List<SubItem>();
@@ -196,7 +197,8 @@ namespace WpfApp1
         private DataGrid SelectFilelistDataGrid(object sender, string name)
         {
             string nm = name.Replace("Cmb", "").Replace("Drive", "").Replace("dg", "");
-            foreach (DataGrid dg in ((Grid)(((Control)sender).Parent)).Children.OfType<DataGrid>())
+            //foreach (DataGrid dg in ((Grid)(((Control)sender).Parent)).Children.OfType<DataGrid>())
+            foreach (DataGrid dg in  GrdMain.Children.OfType<DataGrid>())
             {
                 if (dg.Name.ToLower().Contains(nm.ToLower()))
                 {
@@ -244,6 +246,7 @@ namespace WpfApp1
         {
             //TblComandPath.Text = SelectPathTextBlock(sender, ((DataGrid)sender).Name).Text;
             //((Control)sender).Focus();
+            this.SelectedSide = ((Control)sender).Name.Replace("dg", "");
         }
 
         private void dg_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -323,6 +326,27 @@ namespace WpfApp1
             }
 
             return opositeSide;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+            DataGrid dg = SelectFilelistDataGrid(sender, SelectedSide);
+            string name = ((SubItem)dg.SelectedItem).Name;
+            NewFolderWindow dlg = new NewFolderWindow(name);
+
+            // Configure the dialog box
+            dlg.Owner = this;
+            // Open the dialog box modally 
+            dlg.ShowDialog();
+            
+
+        }
+
+        private static void ResizeColumn(double proportionToTheAvaiableSpace, ColumnDefinition gridColumn)
+        {
+            GridLength gl = new GridLength(proportionToTheAvaiableSpace, GridUnitType.Star);
+            gridColumn.Width = gl;
         }
     }
 
