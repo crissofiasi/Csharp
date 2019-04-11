@@ -36,7 +36,7 @@ namespace WpfApp1
         private void BtnOK_Click(object sender, RoutedEventArgs e)
         {
 
-            MessageBox.Show("Folder " + this.Path+TxtFolderName.Text.Trim() + " will be created!");
+            //MessageBox.Show("Folder " + this.Path+TxtFolderName.Text.Trim() + " will be created!");
 
             if (!IO_Utils.NewFolder(this.Path, TxtFolderName.Text.Trim()))
             {

@@ -56,11 +56,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CopyOrMoveWindow.xaml.cs">
+      <DependentUpon>CopyOrMoveWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="IO_Utils.cs" />
     <Compile Include="NewFolderWindow.xaml.cs">
       <DependentUpon>NewFolderWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="SubItem.cs" />
+    <Page Include="CopyOrMoveWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

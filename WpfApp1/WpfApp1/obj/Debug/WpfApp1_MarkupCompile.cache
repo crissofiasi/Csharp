@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-D:\Csharp\WpfApp1\WpfApp1\obj\Debug\
+E:\mvp\WpfApp1\WpfApp1\obj\Debug\
 WpfApp1
 none
 false
 DEBUG;TRACE
-D:\Csharp\WpfApp1\WpfApp1\App.xaml
-2-277190458
+E:\mvp\WpfApp1\WpfApp1\App.xaml
+3940701460
 
-8658852023
+9694329034
 14434534373
-MainWindow.xaml;NewFolderWindow.xaml;
+CopyOrMoveWindow.xaml;MainWindow.xaml;NewFolderWindow.xaml;
 
 False
 

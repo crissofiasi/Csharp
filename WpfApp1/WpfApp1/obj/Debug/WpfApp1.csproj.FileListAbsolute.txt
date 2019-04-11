@@ -16,7 +16,6 @@ c:\users\criss\source\repos\WpfApp1\WpfApp1\obj\Debug\WpfApp1.pdb
 e:\mvp\WpfApp1\WpfApp1\bin\Debug\WpfApp1.exe.config
 e:\mvp\WpfApp1\WpfApp1\bin\Debug\WpfApp1.exe
 e:\mvp\WpfApp1\WpfApp1\bin\Debug\WpfApp1.pdb
-e:\mvp\WpfApp1\WpfApp1\obj\Debug\WpfApp1.csprojAssemblyReference.cache
 e:\mvp\WpfApp1\WpfApp1\obj\Debug\MainWindow.g.cs
 e:\mvp\WpfApp1\WpfApp1\obj\Debug\App.g.cs
 e:\mvp\WpfApp1\WpfApp1\obj\Debug\WpfApp1_MarkupCompile.cache
@@ -47,3 +46,6 @@ E:\mvp\WpfApp1\WpfApp1\obj\Debug\NewFolderWindow.g.cs
 E:\mvp\WpfApp1\WpfApp1\obj\Debug\NewFolderWindow.baml
 D:\Csharp\WpfApp1\WpfApp1\obj\Debug\NewFolderWindow.g.cs
 D:\Csharp\WpfApp1\WpfApp1\obj\Debug\NewFolderWindow.baml
+E:\mvp\WpfApp1\WpfApp1\obj\Debug\WpfApp1.csprojAssemblyReference.cache
+E:\mvp\WpfApp1\WpfApp1\obj\Debug\CopyOrMoveWindow.g.cs
+E:\mvp\WpfApp1\WpfApp1\obj\Debug\CopyOrMoveWindow.baml

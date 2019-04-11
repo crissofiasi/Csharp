@@ -24,6 +24,7 @@ namespace WpfApp1
         public string Name { get; set; } // Gets the name of the file.
         private bool IsDir { get; set; }
         public Icon SistemIcon { get; set; }
+        public DirectoryInfo CurrentDirectory { get; set; }
 
         public SubItem(FileInfo s)
         {
@@ -38,6 +39,7 @@ namespace WpfApp1
             this.Length = s.Length;
             this.IsDir = false;
             this.SistemIcon = Icon.ExtractAssociatedIcon(this.FullName);
+            this.CurrentDirectory = s.Directory;
         }
 
         public SubItem(DirectoryInfo s)
@@ -45,6 +47,7 @@ namespace WpfApp1
             this.DisplayName = this.Name = s.Name;
             this.CreationTime = s.CreationTime;
             this.Directory = s;
+            this.CurrentDirectory = s.Parent;
             this.DirectoryName = s.FullName;
             this.Extension = s.Extension;
             this.FullName = s.FullName;
@@ -60,6 +63,7 @@ namespace WpfApp1
             this.Name = s.Name;
             this.CreationTime = s.CreationTime;
             this.Directory = s;
+            this.CurrentDirectory = s.Parent;
             if (this.Directory!=null)
                 this.DirectoryName = s.FullName;
             this.Extension = s.Extension;
@@ -78,6 +82,7 @@ namespace WpfApp1
             this.Name = s.Name;
             this.CreationTime = s.CreationTime;
             this.Directory = s.Directory;
+            this.CurrentDirectory = s.Directory;
             this.DirectoryName = s.DirectoryName;
             this.Extension = s.Extension;
             this.FullName = s.FullName;

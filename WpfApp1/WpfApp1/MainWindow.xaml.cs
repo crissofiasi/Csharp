@@ -44,7 +44,7 @@ namespace WpfApp1
             if (currentDir.Parent != null)
             {
                 SubItem first = new SubItem(currentDir.Parent, "..");
-
+                first.CurrentDirectory = new DirectoryInfo(DirectoryPath);
                 list.Add(first);
 
             }
@@ -74,8 +74,8 @@ namespace WpfApp1
             dgRight.ItemsSource = dataLists.listRight;
 
 
-            PopulateDataGrid(CmbLeftDrive);
-            PopulateDataGrid(CmbRightDrive);
+            PopulateDataGrid(CmbLeftDrive,CmbLeftDrive.Text);
+            PopulateDataGrid(CmbRightDrive, CmbLeftDrive.Text);
 
         }
 
@@ -127,9 +127,11 @@ namespace WpfApp1
 
             }
 
+
             DisplayDriveVolumeLabel(sender);
-            // DisplayPath(sender);
-            PopulateDataGrid(sender);
+            string path = ((DriveInfo)cb.SelectedItem).RootDirectory.FullName;
+            DisplayPath(sender,path);
+            PopulateDataGrid(sender,path);
         }
 
 
@@ -137,14 +139,6 @@ namespace WpfApp1
 
 
 
-
-        private void PopulateDataGrid(object sender)
-        {
-            ComboBox cb = (ComboBox)sender;
-            DataGrid dg = SelectFilelistDataGrid(sender, ((ComboBox)sender).Name);
-            dg.ItemsSource = GetFileList(((DriveInfo)cb.SelectedItem).RootDirectory.FullName);
-            FocusOnDatagridCelll(dg, 0, 0);
-        }
 
         private static void FocusOnDatagridCelll(DataGrid dg, int row, int column)
         {
@@ -170,21 +164,33 @@ namespace WpfApp1
             dg.ItemsSource = fileList;
             FocusOnDatagridCelll(dg, 0, 0);
 
-            //   DisplayPath(sender);
+            DisplayPath(sender, path);
+
+        }
+        private void PopulateDataGrid(DataGrid dg, string path)
+        {
+            List<SubItem> fileList = GetFileList(path);
+            if (fileList == null)
+            {
+                MessageBox.Show("Acess Denied!");
+                return;
+            }
+            dg.ItemsSource = fileList;
+            FocusOnDatagridCelll(dg, 0, 0);
+
+           // DisplayPath(dg, path);
 
         }
 
 
 
-        private void DisplayPath(object sender)
+        private void DisplayPath(object sender,string path)
         {
-            DataGrid dg = SelectFilelistDataGrid(sender, ((Control)sender).Name);
+            //DataGrid dg = SelectFilelistDataGrid(sender, ((Control)sender).Name);
 
 
             TextBlock tb = SelectPathTextBlock(sender, ((Control)sender).Name);
-            dg.SelectedItem = dg.Items[0];
-            SubItem sb = (SubItem)dg.SelectedItem;
-            tb.Text = sb.Directory.FullName;
+            tb.Text = path ;
         }
 
         private void DisplayDriveVolumeLabel(object sender)
@@ -226,9 +232,9 @@ namespace WpfApp1
         private TextBlock SelectPathTextBlock(object sender, string name)
         {
             string nm = name.Replace("Cmb", "").Replace("Drive", "").Replace("dg", "");
-            foreach (TextBlock tbl in ((Grid)(((Control)sender).Parent)).Children.OfType<TextBlock>())
+            foreach (TextBlock tbl in GrdMain.Children.OfType<TextBlock>())
             {
-                if (tbl.Name.Contains(nm) && tbl.Name.ToLower().Contains("path"))
+                if (tbl.Name.ToLower().Contains(nm.ToLower()) && tbl.Name.ToLower().Contains("path"))
                 {
                     return tbl;
                 }
@@ -257,9 +263,11 @@ namespace WpfApp1
         private void HandleDblClickOrEnterPressed(object sender)
         {
             SubItem selectedItem = ((SubItem)(((DataGrid)sender).SelectedItem));
+            string path = selectedItem.FullName;
             if (selectedItem.IsDirectory())
             {
-                PopulateDataGrid(sender, selectedItem.FullName);
+                
+                PopulateDataGrid(sender, path);
 
                 //((DataGrid)sender).Focus();
                 ((DataGrid)sender).SelectedIndex = 0;
@@ -336,13 +344,17 @@ namespace WpfApp1
 
             DataGrid dg = SelectFilelistDataGrid(sender, SelectedSide);
             string name = ((SubItem)dg.SelectedItem).Name;
-            string displayname = ((SubItem)dg.SelectedItem).DisplayName;
-            name = (name != displayname) ? "" : name;
-            string fullname = ((SubItem)dg.SelectedItem).FullName;
-            string path = fullname+ ((SubItem)dg.SelectedItem).Name;
-            if (name.Length > 0)
-            {
+            string displayName = ((SubItem)dg.SelectedItem).DisplayName;
+
+            string fullname = ((SubItem)dg.SelectedItem).CurrentDirectory.FullName;
+            string path = fullname;
+            if (name == displayName)
                 path = fullname.Replace(name, "");
+            else
+                name = "";
+            if(!path.EndsWith("\\"))
+            {
+                path += "\\";
             }
 
             NewFolderWindow dlg = new NewFolderWindow(path, name);
@@ -363,6 +375,91 @@ namespace WpfApp1
         {
             GridLength gl = new GridLength(proportionToTheAvaiableSpace, GridUnitType.Star);
             gridColumn.Width = gl;
+        }
+
+        private void BtnCopy_Click(object sender, RoutedEventArgs e)
+        {
+            string source;
+            string destination;
+            GetSourceAndDestinationDirectory(sender, out source, out destination);
+
+            SubItem itemToCopy = ((SubItem)SelectFilelistDataGrid(sender, this.SelectedSide).SelectedItem);
+            if (itemToCopy.Name != itemToCopy.DisplayName)
+            {
+                MessageBox.Show("Eroare: Nu Poti Copia Directorul Parinte!");
+                return;
+            }
+
+
+            string sourceItem = source+itemToCopy.Name;
+            string destinationItem = destination + itemToCopy.Name;
+            CopyOrMoveWindow dlg = new CopyOrMoveWindow("Copy", sourceItem, destinationItem);
+            dlg.Owner = this;
+            dlg.ShowDialog();
+
+            PopulateDataGrid(dgLeft, TblPathLeft.Text);
+            PopulateDataGrid(dgRight, TblPathRight.Text);
+
+
+        }
+
+        private void GetSourceAndDestinationDirectory(object sender, out string source, out string destination)
+        {
+            source = SelectPathTextBlock(sender, this.SelectedSide).Text.Trim();
+            destination = SelectPathTextBlock(sender, GetOpositeSide(this.SelectedSide)).Text.Trim();
+            if (!source.EndsWith("\\"))
+            {
+                source += "\\";
+            }
+            if (!destination.EndsWith("\\"))
+            {
+                destination += "\\";
+            }
+        }
+
+        private void BtnMove_Click(object sender, RoutedEventArgs e)
+        {
+            string source;
+            string destination;
+            GetSourceAndDestinationDirectory(sender, out source, out destination);
+
+            SubItem itemToMove = ((SubItem)SelectFilelistDataGrid(sender, this.SelectedSide).SelectedItem);
+            if (itemToMove.Name != itemToMove.DisplayName)
+            {
+                MessageBox.Show("Eroare: Nu Poti Muta Directorul Parinte!");
+                return;
+            }
+
+
+            source += itemToMove.Name;
+            destination += itemToMove.Name;
+            CopyOrMoveWindow dlg = new CopyOrMoveWindow("Move", source, destination);
+            dlg.Owner = this;
+            dlg.ShowDialog();
+
+            PopulateDataGrid(dgLeft, TblPathLeft.Text);
+            PopulateDataGrid(dgRight, TblPathRight.Text);
+
+        }
+
+        private void BtnEdit_Click(object sender, RoutedEventArgs e)
+        {
+
+
+            string source;
+            string destination;
+            GetSourceAndDestinationDirectory(sender, out source, out destination);
+
+            SubItem selectedItem = ((SubItem)SelectFilelistDataGrid(sender, this.SelectedSide).SelectedItem);
+
+
+            if (!selectedItem.IsDirectory())
+            {
+
+                Process.Start("notepad.exe", selectedItem.FullName.ToString());
+            }
+         
+
         }
     }
 
