@@ -198,7 +198,7 @@ namespace WpfApp1
         {
             string nm = name.Replace("Cmb", "").Replace("Drive", "").Replace("dg", "");
             //foreach (DataGrid dg in ((Grid)(((Control)sender).Parent)).Children.OfType<DataGrid>())
-            foreach (DataGrid dg in  GrdMain.Children.OfType<DataGrid>())
+            foreach (DataGrid dg in GrdMain.Children.OfType<DataGrid>())
             {
                 if (dg.Name.ToLower().Contains(nm.ToLower()))
                 {
@@ -293,7 +293,7 @@ namespace WpfApp1
 
         }
 
-        
+
 
         private void HandleTabPressedInDatagrid(object sender)
         {
@@ -301,9 +301,12 @@ namespace WpfApp1
             string side = ((DataGrid)sender).Name.Replace("dg", "");
             string opositeSide = GetOpositeSide(side);
             opositeDataGrid = SelectFilelistDataGrid(sender, opositeSide);
-            int row=opositeDataGrid.SelectedIndex;
+            int row = opositeDataGrid.SelectedIndex;
             if (row < 0)
+            {
                 row = 0;
+            }
+
             FocusOnDatagridCelll(opositeDataGrid, row, 0);
         }
 
@@ -333,13 +336,26 @@ namespace WpfApp1
 
             DataGrid dg = SelectFilelistDataGrid(sender, SelectedSide);
             string name = ((SubItem)dg.SelectedItem).Name;
-            NewFolderWindow dlg = new NewFolderWindow(name);
+            string displayname = ((SubItem)dg.SelectedItem).DisplayName;
+            name = (name != displayname) ? "" : name;
+            string fullname = ((SubItem)dg.SelectedItem).FullName;
+            string path = fullname+ ((SubItem)dg.SelectedItem).Name;
+            if (name.Length > 0)
+            {
+                path = fullname.Replace(name, "");
+            }
+
+            NewFolderWindow dlg = new NewFolderWindow(path, name);
+
+
 
             // Configure the dialog box
             dlg.Owner = this;
             // Open the dialog box modally 
             dlg.ShowDialog();
-            
+
+            PopulateDataGrid(dg, path);
+
 
         }
 

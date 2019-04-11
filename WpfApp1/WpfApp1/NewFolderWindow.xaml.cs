@@ -20,20 +20,29 @@ namespace WpfApp1
     public partial class NewFolderWindow : Window
     {
         private string InitialName;
+        private string Path;
         public NewFolderWindow()
         {
             InitializeComponent();
             this.InitialName = "";
         }
 
-        public NewFolderWindow(string name):this()
+        public NewFolderWindow(string path, string name):this()
         {
             this.InitialName = name;
+            this.Path = path;
         }
 
         private void BtnOK_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Folder " + TxtFolderName.Text.Trim() + " created!");
+
+            MessageBox.Show("Folder " + this.Path+TxtFolderName.Text.Trim() + " will be created!");
+
+            if (!IO_Utils.NewFolder(this.Path, TxtFolderName.Text.Trim()))
+            {
+                MessageBox.Show("eroare la crearea folderului " + this.Path + this.Name + " !!!");
+            }
+
             this.Close();
         }
 
