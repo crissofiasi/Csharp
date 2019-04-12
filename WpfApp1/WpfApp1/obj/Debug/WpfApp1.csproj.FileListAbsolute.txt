@@ -49,3 +49,5 @@ D:\Csharp\WpfApp1\WpfApp1\obj\Debug\NewFolderWindow.baml
 E:\mvp\WpfApp1\WpfApp1\obj\Debug\WpfApp1.csprojAssemblyReference.cache
 E:\mvp\WpfApp1\WpfApp1\obj\Debug\CopyOrMoveWindow.g.cs
 E:\mvp\WpfApp1\WpfApp1\obj\Debug\CopyOrMoveWindow.baml
+D:\Csharp\WpfApp1\WpfApp1\obj\Debug\CopyOrMoveWindow.g.cs
+D:\Csharp\WpfApp1\WpfApp1\obj\Debug\CopyOrMoveWindow.baml
