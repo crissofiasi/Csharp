@@ -22,6 +22,7 @@ namespace WpfApp1
 
         private DataLists dataLists = new DataLists();
         private string SelectedSide;
+
         public List<SubItem> GetFileList(string DirectoryPath)
         {
             List<SubItem> list = new List<SubItem>();
@@ -30,7 +31,6 @@ namespace WpfApp1
             {
                 return null;
             }
-
             try
             {
                 currentDir.GetDirectories();
@@ -39,25 +39,20 @@ namespace WpfApp1
             {
                 return null;
             }
-
-
             if (currentDir.Parent != null)
             {
                 SubItem first = new SubItem(currentDir.Parent, "..");
                 first.CurrentDirectory = new DirectoryInfo(DirectoryPath);
                 list.Add(first);
-
             }
             foreach (DirectoryInfo dir in currentDir.GetDirectories())
             {
                 list.Add(new SubItem(dir));
             }
-
             foreach (FileInfo file in currentDir.GetFiles())
             {
                 list.Add(new SubItem(file));
             }
-
             return list;
         }
         public MainWindow()
@@ -67,16 +62,17 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            HandleWindowLoaded();
+        }
+
+        private void HandleWindowLoaded()
+        {
             ClearWindow();
             PopulateDriveComboBoxes();
-
             dgLeft.ItemsSource = dataLists.listLeft;
             dgRight.ItemsSource = dataLists.listRight;
-
-
-            PopulateDataGrid(CmbLeftDrive,CmbLeftDrive.Text);
+            PopulateDataGrid(CmbLeftDrive, CmbLeftDrive.Text);
             PopulateDataGrid(CmbRightDrive, CmbLeftDrive.Text);
-
         }
 
         private void ClearWindow()
@@ -94,7 +90,6 @@ namespace WpfApp1
 
         private void PopulateDriveComboBoxes()
         {
-
             foreach (DriveInfo di in DriveInfo.GetDrives())
             {
                 foreach (ComboBox cb in GrdMain.Children.OfType<ComboBox>())
@@ -102,7 +97,6 @@ namespace WpfApp1
                     cb.Items.Add(di);
                 }
             }
-
             foreach (ComboBox cb in GrdMain.Children.OfType<ComboBox>())
             {
                 foreach (object cbi in cb.Items)
@@ -124,22 +118,12 @@ namespace WpfApp1
                 MessageBox.Show("Drive Not Redy! Please chose onother");
                 cb.SelectedItem = e.RemovedItems[0];
                 return;
-
             }
-
-
             DisplayDriveVolumeLabel(sender);
             string path = ((DriveInfo)cb.SelectedItem).RootDirectory.FullName;
             DisplayPath(sender,path);
             PopulateDataGrid(sender,path);
         }
-
-
-
-
-
-
-
         private static void FocusOnDatagridCelll(DataGrid dg, int row, int column)
         {
             dg.Focus();
@@ -150,7 +134,6 @@ namespace WpfApp1
 
             }
         }
-
         private void PopulateDataGrid(object sender, string path)
         {
             Control cb = (Control)sender;
@@ -163,9 +146,7 @@ namespace WpfApp1
             }
             dg.ItemsSource = fileList;
             FocusOnDatagridCelll(dg, 0, 0);
-
             DisplayPath(sender, path);
-
         }
         private void PopulateDataGrid(DataGrid dg, string path)
         {
@@ -177,18 +158,9 @@ namespace WpfApp1
             }
             dg.ItemsSource = fileList;
             FocusOnDatagridCelll(dg, 0, 0);
-
-           // DisplayPath(dg, path);
-
         }
-
-
-
         private void DisplayPath(object sender,string path)
         {
-            //DataGrid dg = SelectFilelistDataGrid(sender, ((Control)sender).Name);
-
-
             TextBlock tb = SelectPathTextBlock(sender, ((Control)sender).Name);
             tb.Text = path ;
         }
@@ -203,7 +175,6 @@ namespace WpfApp1
         private DataGrid SelectFilelistDataGrid(object sender, string name)
         {
             string nm = name.Replace("Cmb", "").Replace("Drive", "").Replace("dg", "");
-            //foreach (DataGrid dg in ((Grid)(((Control)sender).Parent)).Children.OfType<DataGrid>())
             foreach (DataGrid dg in GrdMain.Children.OfType<DataGrid>())
             {
                 if (dg.Name.ToLower().Contains(nm.ToLower()))
@@ -211,7 +182,6 @@ namespace WpfApp1
                     return dg;
                 }
             }
-
             return null;
         }
 
@@ -225,7 +195,6 @@ namespace WpfApp1
                     return tbl;
                 }
             }
-
             return null;
         }
 
@@ -245,14 +214,17 @@ namespace WpfApp1
 
         private void BtnExit_Click(object sender, RoutedEventArgs e)
         {
+            HandleExit();
+        }
+
+        private void HandleExit()
+        {
             mainWindow.Close();
         }
 
         private void dg_GotFocus(object sender, RoutedEventArgs e)
         {
-            //TblComandPath.Text = SelectPathTextBlock(sender, ((DataGrid)sender).Name).Text;
-            //((Control)sender).Focus();
-            this.SelectedSide = ((Control)sender).Name.Replace("dg", "");
+              this.SelectedSide = ((Control)sender).Name.Replace("dg", "");
         }
 
         private void dg_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -269,7 +241,7 @@ namespace WpfApp1
                 
                 PopulateDataGrid(sender, path);
 
-                //((DataGrid)sender).Focus();
+               
                 ((DataGrid)sender).SelectedIndex = 0;
             }
             else
@@ -282,8 +254,12 @@ namespace WpfApp1
 
         private void dgKeyDn(object sender, KeyEventArgs e)
         {
+            HandleKeyDownOnDataGrid(sender, e);
 
+        }
 
+        private void HandleKeyDownOnDataGrid(object sender, KeyEventArgs e)
+        {
             if (e.Key.Equals(Key.Return))
             {
                 HandleDblClickOrEnterPressed(sender);
@@ -297,12 +273,7 @@ namespace WpfApp1
                 HandleTabPressedInDatagrid(sender);
 
             }
-
-
         }
-
-
-
         private void HandleTabPressedInDatagrid(object sender)
         {
             DataGrid opositeDataGrid;
@@ -314,7 +285,6 @@ namespace WpfApp1
             {
                 row = 0;
             }
-
             FocusOnDatagridCelll(opositeDataGrid, row, 0);
         }
 
@@ -332,75 +302,36 @@ namespace WpfApp1
                 default:
                     opositeSide = "";
                     break;
-
-
             }
-
             return opositeSide;
         }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
-            DataGrid dg = SelectFilelistDataGrid(sender, SelectedSide);
-            string name = ((SubItem)dg.SelectedItem).Name;
-            string displayName = ((SubItem)dg.SelectedItem).DisplayName;
-
-            string fullname = ((SubItem)dg.SelectedItem).CurrentDirectory.FullName;
-            string path = fullname;
-            if (name == displayName)
-                path = fullname.Replace(name, "");
-            else
-                name = "";
-            if(!path.EndsWith("\\"))
-            {
-                path += "\\";
-            }
-
-            NewFolderWindow dlg = new NewFolderWindow(path, name);
-
-
-
-            // Configure the dialog box
-            dlg.Owner = this;
-            // Open the dialog box modally 
-            dlg.ShowDialog();
-
-            PopulateDataGrid(dg, path);
-
-
-        }
-
         private static void ResizeColumn(double proportionToTheAvaiableSpace, ColumnDefinition gridColumn)
         {
             GridLength gl = new GridLength(proportionToTheAvaiableSpace, GridUnitType.Star);
             gridColumn.Width = gl;
         }
-
         private void BtnCopy_Click(object sender, RoutedEventArgs e)
+        {
+            HandleCopy(sender);
+        }
+        private void HandleCopy(object sender)
         {
             string source;
             string destination;
             GetSourceAndDestinationDirectory(sender, out source, out destination);
-
             SubItem itemToCopy = ((SubItem)SelectFilelistDataGrid(sender, this.SelectedSide).SelectedItem);
             if (itemToCopy.Name != itemToCopy.DisplayName)
             {
                 MessageBox.Show("Eroare: Nu Poti Copia Directorul Parinte!");
                 return;
             }
-
-
-            string sourceItem = source+itemToCopy.Name;
+            string sourceItem = source + itemToCopy.Name;
             string destinationItem = destination + itemToCopy.Name;
             CopyOrMoveWindow dlg = new CopyOrMoveWindow("Copy", sourceItem, destinationItem);
             dlg.Owner = this;
             dlg.ShowDialog();
-
             PopulateDataGrid(dgLeft, TblPathLeft.Text);
             PopulateDataGrid(dgRight, TblPathRight.Text);
-
-
         }
 
         private void GetSourceAndDestinationDirectory(object sender, out string source, out string destination)
@@ -419,47 +350,88 @@ namespace WpfApp1
 
         private void BtnMove_Click(object sender, RoutedEventArgs e)
         {
+            HandleMove(sender);
+        }
+
+        private void HandleMove(object sender)
+        {
             string source;
             string destination;
             GetSourceAndDestinationDirectory(sender, out source, out destination);
-
             SubItem itemToMove = ((SubItem)SelectFilelistDataGrid(sender, this.SelectedSide).SelectedItem);
             if (itemToMove.Name != itemToMove.DisplayName)
             {
                 MessageBox.Show("Eroare: Nu Poti Muta Directorul Parinte!");
                 return;
             }
-
-
             source += itemToMove.Name;
             destination += itemToMove.Name;
             CopyOrMoveWindow dlg = new CopyOrMoveWindow("Move", source, destination);
             dlg.Owner = this;
             dlg.ShowDialog();
-
             PopulateDataGrid(dgLeft, TblPathLeft.Text);
             PopulateDataGrid(dgRight, TblPathRight.Text);
-
         }
 
         private void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
+            HandleEdit(sender);
+        }
 
-
+        private void HandleEdit(object sender)
+        {
             string source;
             string destination;
             GetSourceAndDestinationDirectory(sender, out source, out destination);
-
             SubItem selectedItem = ((SubItem)SelectFilelistDataGrid(sender, this.SelectedSide).SelectedItem);
-
-
             if (!selectedItem.IsDirectory())
             {
-
                 Process.Start("notepad.exe", selectedItem.FullName.ToString());
             }
-         
+        }
 
+        private void MnuExit_Click(object sender, RoutedEventArgs e)
+        {
+            HandleExit();
+        }
+
+        private void MnuEdit_Click(object sender, RoutedEventArgs e)
+        {
+            HandleEdit(sender);
+        }
+
+        private void MnView_Click(object sender, RoutedEventArgs e)
+        {
+            HandleEdit(sender);
+        }
+
+        private void BtnNew_Click(object sender, RoutedEventArgs e)
+        {
+            HandleNewFolder(sender);
+        }
+
+        private void HandleNewFolder(object sender)
+        {
+            DataGrid dg = SelectFilelistDataGrid(sender, SelectedSide);
+            string name = ((SubItem)dg.SelectedItem).Name;
+            string displayName = ((SubItem)dg.SelectedItem).DisplayName;
+
+            string fullname = ((SubItem)dg.SelectedItem).CurrentDirectory.FullName;
+            string path = fullname;
+            if (name == displayName)
+                path = fullname.Replace(name, "");
+            else
+                name = "";
+            if (!path.EndsWith("\\"))
+            {
+                path += "\\";
+            }
+            NewFolderWindow dlg = new NewFolderWindow(path, name);
+            // Configure the dialog box
+            dlg.Owner = this;
+            // Open the dialog box modally 
+            dlg.ShowDialog();
+            PopulateDataGrid(dg, path);
         }
     }
 
