@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Loaded="Window_Loaded">
+        Title="MainWindow" Height="450" Width="800" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
     <Grid x:Name="GrdMain">
         <Grid.RowDefinitions>
             <RowDefinition Height="64"/>
@@ -55,7 +55,7 @@
             <Button x:Name="BtnCopy" Content="Copy" Margin="0" Grid.Column="2" Click="BtnCopy_Click"/>
             <Button x:Name="BtnMove" Content="Move" Margin="0" Grid.Column="3" Click="BtnMove_Click"/>
             <Button x:Name="BtnNew" Content="New Folder" Margin="0" Grid.Column="4" Click="BtnNew_Click"/>
-            <Button x:Name="BtnExit" Content="Exit" Margin="0" Grid.Column="5" Click="BtnExit_Click"/>
+            <Button x:Name="BtnDelete" Content="Delete" Margin="0" Grid.Column="5" Click="BtnDelete_Click"/>
         </Grid>
         <TextBox Margin="296,0,10,53" Grid.Row="2" TextWrapping="Wrap" Text="TextBox" Height="23" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Grid.RowSpan="2"/>
 

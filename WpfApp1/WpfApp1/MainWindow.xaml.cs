@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -19,52 +20,16 @@ namespace WpfApp1
             public List<SubItem> listLeft;
             public List<SubItem> listRight;
         }
-
         private DataLists dataLists = new DataLists();
         private string SelectedSide;
-
-        public List<SubItem> GetFileList(string DirectoryPath)
-        {
-            List<SubItem> list = new List<SubItem>();
-            DirectoryInfo currentDir = new DirectoryInfo(DirectoryPath);
-            if (!currentDir.Exists)
-            {
-                return null;
-            }
-            try
-            {
-                currentDir.GetDirectories();
-            }
-            catch
-            {
-                return null;
-            }
-            if (currentDir.Parent != null)
-            {
-                SubItem first = new SubItem(currentDir.Parent, "..");
-                first.CurrentDirectory = new DirectoryInfo(DirectoryPath);
-                list.Add(first);
-            }
-            foreach (DirectoryInfo dir in currentDir.GetDirectories())
-            {
-                list.Add(new SubItem(dir));
-            }
-            foreach (FileInfo file in currentDir.GetFiles())
-            {
-                list.Add(new SubItem(file));
-            }
-            return list;
-        }
         public MainWindow()
         {
             InitializeComponent();
         }
-
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             HandleWindowLoaded();
         }
-
         private void HandleWindowLoaded()
         {
             ClearWindow();
@@ -74,20 +39,17 @@ namespace WpfApp1
             PopulateDataGrid(CmbLeftDrive, CmbLeftDrive.Text);
             PopulateDataGrid(CmbRightDrive, CmbLeftDrive.Text);
         }
-
         private void ClearWindow()
         {
             foreach (TextBlock tb in GrdMain.Children.OfType<TextBlock>())
             {
                 tb.Text = "";
             }
-
             foreach (TextBox txt in GrdMain.Children.OfType<TextBox>())
             {
                 txt.Text = "";
             }
         }
-
         private void PopulateDriveComboBoxes()
         {
             foreach (DriveInfo di in DriveInfo.GetDrives())
@@ -109,8 +71,11 @@ namespace WpfApp1
                 }
             }
         }
-
         private void CmbDrive_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            HandleCmbSelectionChanged(sender, e);
+        }
+        private void HandleCmbSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox cb = (ComboBox)sender;
             if (!((DriveInfo)cb.SelectedItem).IsReady)
@@ -121,9 +86,10 @@ namespace WpfApp1
             }
             DisplayDriveVolumeLabel(sender);
             string path = ((DriveInfo)cb.SelectedItem).RootDirectory.FullName;
-            DisplayPath(sender,path);
-            PopulateDataGrid(sender,path);
+            DisplayPath(sender, path);
+            PopulateDataGrid(sender, path);
         }
+
         private static void FocusOnDatagridCelll(DataGrid dg, int row, int column)
         {
             dg.Focus();
@@ -131,14 +97,13 @@ namespace WpfApp1
             if ((dg.Items.Count > row) && (dg.Columns.Count > column))
             {
                 dg.CurrentCell = new DataGridCellInfo(dg.Items[row], dg.Columns[column]);
-
             }
         }
         private void PopulateDataGrid(object sender, string path)
         {
             Control cb = (Control)sender;
             DataGrid dg = SelectFilelistDataGrid(sender, ((Control)sender).Name);
-            List<SubItem> fileList = GetFileList(path);
+            List<SubItem> fileList = IO_Utils.GetFileList(path);
             if (fileList == null)
             {
                 MessageBox.Show("Acess Denied!");
@@ -150,7 +115,7 @@ namespace WpfApp1
         }
         private void PopulateDataGrid(DataGrid dg, string path)
         {
-            List<SubItem> fileList = GetFileList(path);
+            List<SubItem> fileList = IO_Utils.GetFileList(path);
             if (fileList == null)
             {
                 MessageBox.Show("Acess Denied!");
@@ -208,7 +173,6 @@ namespace WpfApp1
                     return tbl;
                 }
             }
-
             return null;
         }
 
@@ -237,11 +201,8 @@ namespace WpfApp1
             SubItem selectedItem = ((SubItem)(((DataGrid)sender).SelectedItem));
             string path = selectedItem.FullName;
             if (selectedItem.IsDirectory())
-            {
-                
+            {   
                 PopulateDataGrid(sender, path);
-
-               
                 ((DataGrid)sender).SelectedIndex = 0;
             }
             else
@@ -249,13 +210,9 @@ namespace WpfApp1
                 Process.Start(selectedItem.FullName.ToString());
             }
         }
-
-
-
         private void dgKeyDn(object sender, KeyEventArgs e)
         {
             HandleKeyDownOnDataGrid(sender, e);
-
         }
 
         private void HandleKeyDownOnDataGrid(object sender, KeyEventArgs e)
@@ -265,13 +222,11 @@ namespace WpfApp1
                 HandleDblClickOrEnterPressed(sender);
                 e.Handled = true;
                 return;
-
             }
 
             if (e.Key.Equals(Key.Tab))
             {
                 HandleTabPressedInDatagrid(sender);
-
             }
         }
         private void HandleTabPressedInDatagrid(object sender)
@@ -415,7 +370,6 @@ namespace WpfApp1
             DataGrid dg = SelectFilelistDataGrid(sender, SelectedSide);
             string name = ((SubItem)dg.SelectedItem).Name;
             string displayName = ((SubItem)dg.SelectedItem).DisplayName;
-
             string fullname = ((SubItem)dg.SelectedItem).CurrentDirectory.FullName;
             string path = fullname;
             if (name == displayName)
@@ -432,6 +386,31 @@ namespace WpfApp1
             // Open the dialog box modally 
             dlg.ShowDialog();
             PopulateDataGrid(dg, path);
+        }
+
+        private void BtnDelete_Click(object sender, RoutedEventArgs e)
+        {
+            HandleDelete(sender);
+        }
+
+        private void HandleDelete(object sender)
+        {
+            string source;
+            string destination;
+            GetSourceAndDestinationDirectory(sender, out source, out destination);
+            SubItem itemToDelete = ((SubItem)SelectFilelistDataGrid(sender, this.SelectedSide).SelectedItem);
+            if (itemToDelete.Name != itemToDelete.DisplayName)
+            {
+                MessageBox.Show("Eroare: Nu Poti Sterge Directorul Parinte!");
+                return;
+            }
+            MessageBoxResult result = MessageBox.Show("Siguri vrei sa stergi "+itemToDelete.Name.Trim()+"?", "Delete?", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                itemToDelete.Delete();
+            }
+            PopulateDataGrid(dgLeft, TblPathLeft.Text);
+            PopulateDataGrid(dgRight, TblPathRight.Text);
         }
     }
 

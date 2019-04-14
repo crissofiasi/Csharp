@@ -55,7 +55,7 @@ namespace WpfApp1
             this.LastWriteTime = s.LastWriteTime;
             this.Length = 0;
             this.IsDir = true;
-          //  this.SistemIcon = Icon.ExtractAssociatedIcon(this.FullName);
+            //  this.SistemIcon = Icon.ExtractAssociatedIcon(this.FullName);
         }
 
         public SubItem(DirectoryInfo s, string DirectoryDisplayName)
@@ -64,7 +64,7 @@ namespace WpfApp1
             this.CreationTime = s.CreationTime;
             this.Directory = s;
             this.CurrentDirectory = s.Parent;
-            if (this.Directory!=null)
+            if (this.Directory != null)
                 this.DirectoryName = s.FullName;
             this.Extension = s.Extension;
             this.FullName = s.FullName;
@@ -98,6 +98,32 @@ namespace WpfApp1
             return this.IsDir;
         }
 
-
+        internal bool Delete()
+        {
+            bool rt = true;
+            if (this.IsDirectory())
+            {
+                
+                try
+                {
+                   
+                    this.Directory.Delete(true);
+                }
+                catch (Exception ex)
+                {
+                    //return false;
+                    //MessageBox.Show("A intervenit o eroare la stergerea folderului " + this.Name + "(" + ex.Message + ")");
+                    rt = false;
+                }
+            }
+            else
+            {
+                if (File.Exists(this.FullName))
+                {
+                    File.Delete(this.FullName);
+                };
+            }
+            return rt;
+        }
     }
 }

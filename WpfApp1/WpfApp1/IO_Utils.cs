@@ -125,5 +125,40 @@ namespace WpfApp1
 
             return true;
         }
+
+        internal static List<SubItem> GetFileList(string DirectoryPath)
+        {
+            List<SubItem> list = new List<SubItem>();
+            DirectoryInfo currentDir = new DirectoryInfo(DirectoryPath);
+            if (!currentDir.Exists)
+            {
+                return null;
+            }
+            try
+            {
+                currentDir.GetDirectories();
+            }
+            catch
+            {
+                return null;
+            }
+            if (currentDir.Parent != null)
+            {
+                SubItem first = new SubItem(currentDir.Parent, "..");
+                first.CurrentDirectory = new DirectoryInfo(DirectoryPath);
+                list.Add(first);
+            }
+            foreach (DirectoryInfo dir in currentDir.GetDirectories())
+            {
+                list.Add(new SubItem(dir));
+            }
+            foreach (FileInfo file in currentDir.GetFiles())
+            {
+                list.Add(new SubItem(file));
+            }
+            return list;
+        }
+        
+
     }
 }
