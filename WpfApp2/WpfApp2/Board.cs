@@ -29,6 +29,23 @@ namespace WpfApp2
 
         }
 
+        public Board()
+        {
+            this.Size = 3;
+            Rows = new ObservableCollection<ObservableCollection<InnerGrid>>();
+            for (int i = 0; i < this.Size; i++)
+            {
+                ObservableCollection<InnerGrid> row = new ObservableCollection<InnerGrid>();
+                for (int j = 0; j < this.Size; j++)
+                {
+                    InnerGrid c = new InnerGrid(this.Size);
+                    row.Add(c);
+
+                }
+                Rows.Add(row);
+            }
+
+        }
 
 
     }
