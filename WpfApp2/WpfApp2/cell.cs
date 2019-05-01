@@ -3,17 +3,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace WpfApp2
 {
-    public class Cell
+    public class Cell : INotifyPropertyChanged
     {
-        public int Value { get; set; }
+        private int? _value;
+        public int? Value {
+            get
+            {
+                return _value;
+            }
+             set
+            {
+                if (value == _value)
+                    return;
+                _value = value;
+                propChanged(nameof(Value));
+            }
+        }
+
+        public int? obs;
         public bool IsReadOnly { get; set; }
         public Cell()
         {
-            this.Value = 9;
+            this.Value = 0;
             this.IsReadOnly = false;
         }
+
+        #region inotify
+
+        public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
+        private void propChanged(string name)
+        {
+            PropertyChanged(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
+
     }
 }
