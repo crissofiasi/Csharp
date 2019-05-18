@@ -30,12 +30,5 @@ namespace WpfApp2
             this.DataContext = new MainWindowViewModel();
         }
 
-        //private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        //{
-        //    Int32 size = 3;
-        //    bool ok = Int32.TryParse( ((ComboBoxItem)(((ComboBox)sender).SelectedItem)).Tag.ToString(), out size);
-             
-        //    this.DataContext = new Board(ok?size:3);
-        //}
-    }
+            }
 }

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp2"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="{Binding Height, Mode=TwoWay}" Width="{Binding Width, Mode=TwoWay}" Left="{Binding Left, Mode=TwoWay}" Top="{Binding Top, Mode=TwoWay}">
     <Window.DataContext>
         <local:MainWindowViewModel/>
     </Window.DataContext>
@@ -19,28 +19,37 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="135"/>
             <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="127"/>
+            <ColumnDefinition Width="0"/>
         </Grid.ColumnDefinitions>
 
 
-        
+
 
 
         <local:SdkGrid DataContext="{Binding SudokuBoard, Mode=OneWay}" Grid.Column="1" Grid.Row="1" />
 
-        <ComboBox HorizontalAlignment="Left" Margin="15,107.6,0,0" Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" Width="120"
+        <ComboBox HorizontalAlignment="Left" Margin="9,33.6,0,0" Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" Width="120"
                   SelectedValue="{Binding Size}"
                   SelectedValuePath="Tag"
                   >
-            
+
             <ComboBoxItem Content="4x4" Tag="2"/>
             <ComboBoxItem Content="9x9" Tag="3" IsSelected="True"/>
             <ComboBoxItem Content="16x16" Tag="4" />
 
         </ComboBox>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="36,166.6,0,0" Grid.Row="1" VerticalAlignment="Top" Width="75"
+        <StackPanel Margin="10,59.6,13,13.4" Grid.Row="1" Grid.RowSpan="2">
+            <Button Content="New Game" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="75" Margin="5"
                  Command="{Binding DrowBrd}"/>
+            <Button Content="Save Game" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="75" Margin="5"
+                 Command="{Binding SaveBrd}"/>
+            <Button Content="Validate" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="75" Margin="5"
+                 Command="{Binding ValidateBrd}"/>
 
+
+
+        </StackPanel>
+        <Label Content="Game Size" HorizontalAlignment="Left" Margin="10,8.6,0,0" Grid.Row="1" VerticalAlignment="Top" Width="119"/>
 
 
 

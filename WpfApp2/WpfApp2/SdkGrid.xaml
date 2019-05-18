@@ -52,10 +52,10 @@
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
                                                         <Border BorderBrush="Black" BorderThickness="0" Width="40" Height="40" >
-                                                            <TextBox Text="{Binding Value}" 
+                                                            <TextBox Text="{Binding CellValue}" 
                                                                          Width="{Binding RelativeSource={RelativeSource AncestorType=Border, AncestorLevel=1}, Path=Width}"
                                                                          Height="{Binding RelativeSource={RelativeSource AncestorType=Border, AncestorLevel=1}, Path=Height}" 
-                                                                         TextAlignment="Center" FontSize="22" Padding="5px"/>
+                                                                         TextAlignment="Center" FontSize="22" Padding="5px" />
                                                         </Border>
                                                     </DataTemplate>
                                                 </ItemsControl.ItemTemplate>

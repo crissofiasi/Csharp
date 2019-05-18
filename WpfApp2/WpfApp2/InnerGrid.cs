@@ -26,8 +26,7 @@ namespace WpfApp2
                 
                 }
                 Rows.Add(row);
-            }
-            
+            }            
         }
     }
 }

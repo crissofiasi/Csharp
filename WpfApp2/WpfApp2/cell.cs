@@ -9,18 +9,18 @@ namespace WpfApp2
 {
     public class Cell : INotifyPropertyChanged
     {
-        private int? _value;
-        public int? Value {
+        private int? _MyPrivateValue;
+        public int? CellValue {
             get
             {
-                return _value;
+                return _MyPrivateValue;
             }
              set
             {
-                if (value == _value)
+                if (value == _MyPrivateValue)
                     return;
-                _value = value;
-                propChanged(nameof(Value));
+                _MyPrivateValue = value < 1 ? null:value ;
+                propChanged(nameof(CellValue));
             }
         }
 
@@ -28,7 +28,7 @@ namespace WpfApp2
         public bool IsReadOnly { get; set; }
         public Cell()
         {
-            this.Value = 0;
+            this.CellValue = null;
             this.IsReadOnly = false;
         }
 

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.IO;
 
 namespace WpfApp2
 {
@@ -50,82 +51,116 @@ namespace WpfApp2
 
         public void generateRandomBoard()
         {
-            for (int oi = 0; oi < this.Size; oi++)
-            {
-                for (int oj = 0; oj < this.Size; oj++)
-                {
+            //saveBoard();
 
+            loadBoard();
+        }
+
+
+        public void loadBoard()
+        {
+            DirectoryInfo GameDir =new DirectoryInfo( "..\\..\\Games\\" + this.Size.ToString().Trim());
+           FileInfo[] files = GameDir.GetFiles();
+            Random rand = new Random();
+
+            int randomFileIndex = rand.Next(files.Length - 1);
+            string filename = files[randomFileIndex].FullName.Trim();
+            StringReader reader = new StringReader(filename);
+            IEnumerable<string> lines = File.ReadLines(filename);
+            int k = 0;
+            for (int oi = 0; oi < this.Size; oi++)
+                for (int oj = 0; oj < this.Size; oj++)
                     for (int ii = 0; ii < this.Size; ii++)
-                    {
                         for (int ij = 0; ij < this.Size; ij++)
-                        {
-                            this.Rows[oi][oj].Rows[ii][ij].Value = -1;
+                        { 
+                            Int32 v;
+                            string strValue = lines.ElementAt<string>(k++);
+                            Int32.TryParse(strValue,out v) ;
+                            this.Rows[oi][oj].Rows[ii][ij].CellValue = v ;
+                            if (v==0)
+                                this.Rows[oi][oj].Rows[ii][ij].CellValue = null ;
 
                         }
-                    }
-                }
+            reader.Close();
+
+
+
+        }
+
+        public bool IsComplete()
+        {
+            for (int oi = 0; oi < this.Size; oi++)
+                for (int oj = 0; oj < this.Size; oj++)
+                    for (int ii = 0; ii < this.Size; ii++)
+                        for (int ij = 0; ij < this.Size; ij++)
+                            if (this.Rows[oi][oj].Rows[ii][ij].CellValue == null)
+                                return false;
+            return true;
+        }
+
+        public bool ValidateBoard()
+        {
+            for (int oi = 0; oi < this.Size; oi++)
+                for (int oj = 0; oj < this.Size; oj++)
+                    for (int ii = 0; ii < this.Size; ii++)
+                        for (int ij = 0; ij < this.Size; ij++)
+                            if (!ValidateCell(oi, oj, ii, ij))
+                                return false;
+            return true;
+        }
+
+        public void SaveBoard()
+        {
+            
+            string dirName = "..\\..\\Games\\" + this.Size.ToString().Trim()+"\\";
+            FileInfo file = new FileInfo(dirName + "a.txt");
+
+            while (file.Exists)
+            {
+                string fileName = RandomName()+".txt";
+                file = new FileInfo(dirName + fileName);
             }
+
+            StreamWriter writer = new StreamWriter(file.FullName);
 
             for (int oi = 0; oi < this.Size; oi++)
-            {
                 for (int oj = 0; oj < this.Size; oj++)
-                {
-
                     for (int ii = 0; ii < this.Size; ii++)
-                    {
                         for (int ij = 0; ij < this.Size; ij++)
-                        {
-                            Random rnd = new Random();
-                            int? v = 0;// rnd.Next(1, this.Size * this.Size);
-                            int k = 0;
-                            this.Rows[oi][oj].Rows[ii][ij].obs = null;
-                            this.Rows[oi][oj].Rows[ii][ij].Value = v;
-                            do
-                            {
-                                v = this.Rows[oi][oj].Rows[ii][ij].Value;
-                                v++;
-                                v = (v == this.Size * this.Size + 1) ? 1 : v;
-                                if ((++k > this.Size * this.Size) || (v == this.Rows[oi][oj].Rows[ii][ij].obs))
-                                {
+                            writer.WriteLine(this.Rows[oi][oj].Rows[ii][ij].CellValue.ToString().Trim().PadRight(2));
+            writer.Close();
+            MessageBox.Show("Saved");
+        }
 
-                                    this.Rows[oi][oj].Rows[ii][ij].Value = -1;
-                                    k = 1;
-                                    ij--;
-                                    if (ij < 0) { ij = this.Size - 1; ii--; }
-                                    if (ii < 0) { ii = this.Size - 1; oj--; }
-                                    if (oj < 0) { oj = this.Size - 1; oi--; }
-                                    if (oi < 0) { MessageBox.Show("WTF??"); return; }
-                                    if (this.Rows[oi][oj].Rows[ii][ij].obs == null)
-                                         this.Rows[oi][oj].Rows[ii][ij].obs = this.Rows[oi][oj].Rows[ii][ij].Value;
-                                    v = this.Rows[oi][oj].Rows[ii][ij].Value;
-                                    v++;
-                                    v = (v == this.Size * this.Size + 1) ? 1 : v;
+        private static string RandomName()
+        {
+            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var stringChars = new char[8];
+            var random = new Random();
 
-                                }
-
-
-                                this.Rows[oi][oj].Rows[ii][ij].Value = v;
-                                
-                            
-                            } while (!ValidateCell(oi, oj, ii, ij));
-
-                        }
-                    }
-                }
+            for (int i = 0; i < stringChars.Length; i++)
+            {
+                stringChars[i] = chars[random.Next(chars.Length)];
             }
+
+            var finalString = new String(stringChars);
+            return finalString;
         }
 
         public bool ValidateCell(int oi, int oj, int ii, int ij)
         {
-            if (this.Rows[oi][oj].Rows[ii][ij].Value == null)
+            if (this.Rows[oi][oj].Rows[ii][ij].CellValue == null)
                 return true;
+            if (this.Rows[oi][oj].Rows[ii][ij].CellValue > this.Size*this.Size)
+                return false;
+
 
             bool condition = false;
             for (int i = 0; i < Size; i++)
             {
                 for (int j = 0; j < Size; j++)
                 {
-                    condition = this.Rows[oi][oj].Rows[ii][ij].Value == this.Rows[oi][oj].Rows[i][j].Value;
+                    condition = this.Rows[oi][oj].Rows[ii][ij].CellValue == this.Rows[oi][oj].Rows[i][j].CellValue;
                     condition &= ((ii != i) || (ij != j));
                     if (condition)
                     {
@@ -139,7 +174,7 @@ namespace WpfApp2
                 for (int i = 0; i < Size; i++)
                 {
 
-                    condition = this.Rows[oi][oj].Rows[ii][ij].Value == this.Rows[o_i][oj].Rows[i][ij].Value;
+                    condition = this.Rows[oi][oj].Rows[ii][ij].CellValue == this.Rows[o_i][oj].Rows[i][ij].CellValue;
                     condition &= ((ii != i) || (oi != o_i));
                     if (condition)
                     {
@@ -153,7 +188,7 @@ namespace WpfApp2
                 for (int j = 0; j < Size; j++)
                 {
 
-                    condition = this.Rows[oi][oj].Rows[ii][ij].Value == this.Rows[oi][o_j].Rows[ii][j].Value;
+                    condition = this.Rows[oi][oj].Rows[ii][ij].CellValue == this.Rows[oi][o_j].Rows[ii][j].CellValue;
                     condition &= ((ij != j) || (oj != o_j));
                     if (condition)
                     {
